@@ -7,6 +7,10 @@ No iPhone, connected device, proxy, account token, or Find My decryption key is 
 This is a command-line developer experiment, not a supported Apple API or a
 guaranteed Find My spoofing product. It uses private macOS preference keys.
 
+Unlike tools that run on macOS to spoof a connected iPhone,
+this project changes the simulated Core Location reported by
+the same Mac on which the tool is running.
+
 ## Requirements and tested scope
 
 - macOS with Python 3.9 or newer available as `python3`.
