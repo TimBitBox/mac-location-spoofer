@@ -1,4 +1,4 @@
-# Mac Location Lab
+# Mac Location Spoofer
 
 Experimental location simulation **on the Mac running the tool**. Set a latitude
 and longitude, restart Core Location, and let Mac apps request the simulated fix.
