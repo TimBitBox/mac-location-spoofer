@@ -1,15 +1,18 @@
 # Mac Location Spoofer
 
-Experimental location simulation **on the Mac running the tool**. Set a latitude
-and longitude, restart Core Location, and let Mac apps request the simulated fix.
+This project spoofs the location of the Mac running it.
+It does not spoof the location of a connected iPhone or iPad.
+
+Unlike other tools that run on macOS to spoof a connected iPhone,
+this project changes the simulated Core Location reported by
+the same Mac on which the tool is running.
+
+Location spoofing **on the Mac running the tool**. Set a latitude
+and longitude, that's it.
 No iPhone, connected device, proxy, account token, or Find My decryption key is needed.
 
 This is a command-line developer experiment, not a supported Apple API or a
 guaranteed Find My spoofing product. It uses private macOS preference keys.
-
-Unlike tools that run on macOS to spoof a connected iPhone,
-this project changes the simulated Core Location reported by
-the same Mac on which the tool is running.
 
 ## Requirements and tested scope
 
