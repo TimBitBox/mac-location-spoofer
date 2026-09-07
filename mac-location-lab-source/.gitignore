@@ -1,8 +1,0 @@
-__pycache__/
-*.pyc
-.DS_Store
-.venv/
-dist/
-*.log
-.env*
-original.json
