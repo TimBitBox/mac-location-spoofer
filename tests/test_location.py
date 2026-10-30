@@ -1,12 +1,13 @@
 import contextlib
 import io
 import math
-from pathlib import Path
 import subprocess
+import sys
 import tempfile
 import unittest
-from unittest.mock import patch, Mock
-import sys
+from pathlib import Path
+from unittest.mock import Mock, patch
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import mac_location_lab as lab
 
@@ -50,6 +51,7 @@ class Commands(unittest.TestCase):
         self.stack.enter_context(patch.object(lab.platform, 'system', return_value='Darwin'))
         self.stack.enter_context(patch.object(lab.os, 'geteuid', return_value=0))
         self.stack.enter_context(contextlib.redirect_stdout(io.StringIO()))
+        self.stack.enter_context(contextlib.redirect_stderr(io.StringIO()))
         self.stack.enter_context(patch.object(lab, 'private_directory'))
         self.original = {d: {k: None for k in lab.KEYS} for d in lab.DOMAINS}
         self.stack.enter_context(patch.object(lab, 'snapshot', return_value=self.original))
@@ -110,7 +112,10 @@ class Commands(unittest.TestCase):
         self.restart.assert_not_called()
 
     def test_findmy_requires_explicit_option(self):
-        self.command('--refresh-findmy')
+        console = subprocess.CompletedProcess([], 0, '501\n', '')
+        with patch.dict(lab.os.environ, {'SUDO_UID': '501'}), \
+                patch.object(lab.subprocess, 'run', return_value=console):
+            self.command('--refresh-findmy')
         self.refresh.assert_called_once()
 
 
