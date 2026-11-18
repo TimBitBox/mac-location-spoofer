@@ -29,9 +29,15 @@ def preference(domain, operation, key, value=None):
         args += ['-float', str(value)]
     result = run(args, check=False)
     if result.returncode:
-        if operation in ('read', 'delete') and 'does not exist' in result.stderr.lower():
+        if operation in ('read', 'delete') and (
+            'does not exist' in result.stderr.lower()
+            or 'could not find key' in result.stderr.lower()
+        ):
             return None
-        raise RuntimeError('Core Location preference access failed; no success is assumed.')
+        raise RuntimeError(
+            f"Preference operation failed (exit {result.returncode}): "
+            f"{result.stderr.strip() or result.stdout.strip() or 'No diagnostic output'}"
+        )
     if operation == 'read':
         number = float(result.stdout.strip())
         if not math.isfinite(number):
@@ -94,8 +100,15 @@ def restart_location():
     run(['/usr/bin/killall', '-u', 'root', 'cfprefsd'], check=False)
     time.sleep(2)
     old = run(['/usr/bin/pgrep', '-x', 'locationd']).stdout.split()
-    run(['/bin/launchctl', 'kill', 'SIGTERM', 'system/com.apple.locationd'])
-    for _ in range(50):
+    result = run(
+        ['/bin/launchctl', 'kill', 'SIGTERM', 'system/com.apple.locationd'],
+        check=False
+    )
+    if result.returncode:
+        # macOS 27 refuses launchctl kill on locationd under SIP; a plain
+        # SIGTERM from root still works and launchd respawns the daemon.
+        run(['/usr/bin/killall', '-TERM', 'locationd'], check=False)
+    for _ in range(100):
         current = run(['/usr/bin/pgrep', '-x', 'locationd'], check=False).stdout.split()
         if current and not set(old).intersection(current):
             run(['/usr/bin/notifyutil', '-p', 'com.apple.locationd/Prefs'])
